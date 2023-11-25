@@ -13,24 +13,30 @@ def connect_db():
     return sqlite3.connect('data.db')
 
 def create_db():
-# Create database
+    # Create database
     conn = connect_db()
     c = conn.cursor()
+    
     c.execute('''CREATE TABLE IF NOT EXISTS tasks
-                (taskID INTEGER PRIMARY KEY AUTOINCREMENT, 
-                title TEXT, 
-                description TEXT,
-                date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                deadline TIME )''') # Add userID later
+                 (taskID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                 title TEXT, 
+                 description TEXT,
+                 date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                 deadline TIME)''')
+    
     c.execute('''CREATE TABLE IF NOT EXISTS users
-            (userID INTEGER PRIMARY KEY AUTOINCREMENT, 
-                firstname TEXT,
-                username TEXT, 
-                password TEXT,
-                role TEXT )''') # Add userID later
+                 (userID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                 firstname TEXT,
+                 username TEXT, 
+                 password TEXT,
+                 role TEXT)''')  # Add userID later
+    
+    c.execute('''INSERT INTO users (firstname, username, password, role)
+                 VALUES ('John Doe', 'john_doe', 'password123', 'Admin')''')
+    
     conn.commit()
-
     conn.close()
+
 
 @app.route('/', methods = ['POST', 'GET'])
 def login():
@@ -41,7 +47,29 @@ def login():
         val = database.check_login(username, password)
         if val == None:
             print("Username and/or password is none")
-            return redirect(url_for('index'))
+            return redirect(url_for('loginInvalid'))
+        session['name'] = val[1]['firstname']
+        session['userID'] = val[0]['userID']
+        session['logged_in'] = True
+
+        if val[4] == "Admin":
+            session['isAdmin'] = True
+        else:
+            session['isAdmin'] = False
+
+    print(session)
+    return render_template('login.html')
+
+@app.route('/l', methods = ['POST', 'GET'])
+def loginInvalid():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        val = database.check_login(username, password)
+        if val == None:
+            print("Username and/or password is none")
+            return redirect(url_for('loginInvalid'))
         session['name'] = val[1]['firstname']
         session['userID'] = val[0]['userID']
         session['logged_in'] = True
@@ -51,7 +79,7 @@ def login():
             session['isAdmin'] = False
 
     print(session)
-    return render_template('login.html')
+    return render_template('loginInvalid.html')
 
 # Home page - Display existing posts
 @app.route('/home')

@@ -1,17 +1,6 @@
 from app import *
 
-# Create new post
-def create_post(title, content):
-    conn = connect_db()
-    c = conn.cursor()
-
-    # Insert post into database
-    c.execute("INSERT INTO posts(title, content) VALUES (?, ?)" ,(title, content))
-
-    conn.commit()
-    conn.close()
-
-
+# Check user login
 def check_login(username, password):
     conn = connect_db()
     print("checking login")
@@ -20,10 +9,12 @@ def check_login(username, password):
     c = conn.cursor()
 
     try:
-        sql = c.execute("""SELECT * FROM users WHERE username=%s""", username, password)
+        sql = c.execute("""SELECT * FROM users WHERE username=? AND password=?""", (username, password))
+        results = sql.fetchall()
+        print(results)
         c.close()
         conn.close()
-        return sql
+        return results
     except:
         print("Error Invalid Login")
     c.close()
