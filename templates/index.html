@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Manager 2023</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="header" class="sidebar">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+        <a  href="{{ url_for('index') }}" class="sidebar-button">Home</a>
+        <a  class="sidebar-button">About</a>
+    </div>
+
+    <div class="container">
+
+    <div class="content-container">
+        
+        <h1>Dashboard</h1>
+        <h3>Version 1.0.0.<br></h3>
+        <ul>
+            {% for task in tasks %}
+            <li>
+                <strong>{{ task[1] }}</strong>
+                <p class="post-content">{{ task[2] }}</p>
+                <p class="post-deadline">Due by: {{ task[3] }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('post') }}" class="create-post-link">+ Add Post</a>
+        <h3>Project Manager 2023 ©. Powered by YMD. All Rights Reserved.</h3>
+    </div>
+    </div>
+    
+</body>
+</html>
